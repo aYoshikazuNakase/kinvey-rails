@@ -17,8 +17,8 @@ Jeweler::Tasks.new do |gem|
   gem.name = "kinvey-rails"
   gem.homepage = "http://github.com/aYoshikazuNakase/kinvey-rails"
   gem.license = "MIT"
-  gem.summary = %Q{TODO: one-line summary of your gem}
-  gem.description = %Q{TODO: longer description of your gem}
+  gem.summary = %Q{Kinvey library on Rails}
+  gem.description = %Q{Kinvey library on Rails}
   gem.email = "yoshikazu.nakase@access-company.com"
   gem.authors = ["yoshikazu.nakase"]
   # dependencies defined in Gemfile
