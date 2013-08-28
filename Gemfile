@@ -12,4 +12,8 @@ group :development do
   gem "jeweler", "~> 1.8.7"
 #  gem "rcov", ">= 0"
   gem "simplecov"
+
+  gem 'faraday'
+  gem 'faraday_middleware'
+  gem 'uuidtools'
 end
