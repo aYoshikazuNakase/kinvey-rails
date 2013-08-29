@@ -16,8 +16,13 @@ describe "KinveyRails" do
   end
 
   it "login" do
-    @kinvey.login("a", "111111")
+    @kinvey.login("a", "111111").should be_true
     @kinvey.active_user.should_not be_nil
     @kinvey.active_user.username.should == "a"
+  end
+
+  it "logout" do
+    @kinvey.logout.should be_true
+    @kinvey.active_user.should be_nil
   end
 end

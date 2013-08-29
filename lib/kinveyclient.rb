@@ -1,7 +1,7 @@
 module Kinvey
 
   class KinveyClient
-    @active_user = nil
+    @m_actuser = nil
 
     def initialize(app_key, app_secret)
       @appKey = app_key
@@ -25,7 +25,17 @@ module Kinvey
     end
 
     def active_user
-      @active_user
+      @m_actuser
+    end
+
+    def active_user=(user)
+      if user.nil? then
+        @m_actuser = nil
+        @conn.headers['Authorization'] = @appAuth
+      else
+        @m_actuser = user
+        @conn.headers['Authorization'] = "Kinvey #{@m_actuser.authtoken}"
+      end
     end
 
     def login(username, password)
@@ -34,27 +44,32 @@ module Kinvey
         "password" => password
       }
 
-      addHeaderAuth
-      res = @conn.post do |req|
+      resp = @conn.post do |req|
         req.url "/user/#{@appKey}/login"
         req.body = body
       end
 
-      if res.status == 200 then
-        @active_user = Kinvey::User.new(res.body)
+      if resp.status == 200 then
+        self.active_user = Kinvey::User.new(resp.body)
       else
-        @active_user = nil
+        self.active_user = nil
       end
+
+      not self.active_user.nil?
     end
 
-    private
-    def addHeaderAuth
-      if @active_user.nil? then
-        @conn.headers['Authorization'] = @appAuth
-      else
-        # @conn.headers['Authorization'] = @appAuth
+    def logout
+      if not @m_actuser.nil? then
+        resp = @conn.post do |req|
+          req.url "/user/#{@appKey}/_logout"
+        end
+
+        if resp.status == 204 then
+          self.active_user = nil
+        end
+
+        self.active_user.nil?
       end
     end
-
   end
 end
