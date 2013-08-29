@@ -2,7 +2,9 @@ require "faraday"
 require "faraday_middleware"
 require "uuidtools"
 require "base64"
+
 require "kinveyclient"
+require "user"
 
 module Kinvey
   KINVEY_HOST = 'https://baas.kinvey.com/'

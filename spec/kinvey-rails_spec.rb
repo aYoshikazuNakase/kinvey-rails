@@ -8,9 +8,16 @@ describe "KinveyRails" do
 
   it "init Kinvey" do
     @kinvey.should_not be_nil
+    @kinvey.active_user.should be_nil
   end
 
   it "handshake" do
     @kinvey.handshake.status.should == 200
+  end
+
+  it "login" do
+    @kinvey.login("a", "111111")
+    @kinvey.active_user.should_not be_nil
+    @kinvey.active_user.username.should == "a"
   end
 end
