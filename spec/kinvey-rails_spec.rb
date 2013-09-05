@@ -21,6 +21,12 @@ describe "KinveyRails" do
     @kinvey.active_user.username.should == "a"
   end
 
+  it "datastore" do
+    resp = @kinvey.data_store(:collection => "bookmarkCollection")
+    resp.status.should == 200
+    resp.body.length.should == 2
+  end
+
   it "logout" do
     @kinvey.logout.should be_true
     @kinvey.active_user.should be_nil

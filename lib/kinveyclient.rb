@@ -28,16 +28,6 @@ module Kinvey
       @m_actuser
     end
 
-    def active_user=(user)
-      if user.nil? then
-        @m_actuser = nil
-        @conn.headers['Authorization'] = @appAuth
-      else
-        @m_actuser = user
-        @conn.headers['Authorization'] = "Kinvey #{@m_actuser.authtoken}"
-      end
-    end
-
     def login(username, password)
       body = {
         "username" => username,
@@ -69,6 +59,27 @@ module Kinvey
         end
 
         self.active_user.nil?
+      end
+    end
+
+    def data_store(opt)
+      collection = opt[:collection]
+
+      resp = @conn.get do |req|
+        req.url "/appdata/#{@appKey}/#{collection}"
+      end
+    end
+
+    ######
+    private
+
+    def active_user=(user)
+      if user.nil? then
+        @m_actuser = nil
+        @conn.headers['Authorization'] = @appAuth
+      else
+        @m_actuser = user
+        @conn.headers['Authorization'] = "Kinvey #{@m_actuser.authtoken}"
       end
     end
   end
