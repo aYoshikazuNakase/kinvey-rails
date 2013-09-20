@@ -1,6 +1,9 @@
 module Kinvey
 
   class KinveyClient
+    attr_reader :conn
+    attr_reader :appKey
+
     @m_actuser = nil
 
     def initialize(app_key, app_secret)
@@ -62,7 +65,11 @@ module Kinvey
       end
     end
 
-    def data_store(opt)
+    def datastore(clazz)
+      clazz.new(self)
+    end
+
+    def datastore_retrieve(opt)
       collection = opt[:collection]
 
       resp = @conn.get do |req|
