@@ -9,7 +9,6 @@ module Kinvey
     def initialize(app_key, app_secret)
       @appKey = app_key
       @appSecret = app_secret
-      @appAuth = "Basic " + Base64.strict_encode64("#{@appKey}:#{@appSecret}")
 
       @conn = Faraday.new(:url => KINVEY_HOST) do |builder|
         builder.request  :url_encoded
@@ -17,8 +16,8 @@ module Kinvey
         builder.adapter  :net_http
         builder.response :json, :content_type => /\bjson/
       end
-      @conn.headers['Authorization'] = @appAuth
       @conn.headers['X-Kinvey-API-Version'] = '2'
+      self.active_user = nil
     end
 
     def handshake
@@ -46,9 +45,8 @@ module Kinvey
         self.active_user = Kinvey::User.new(resp.body)
       else
         self.active_user = nil
+        Kinvey::Error.from_response(resp)
       end
-
-      not self.active_user.nil?
     end
 
     def logout
@@ -59,22 +57,14 @@ module Kinvey
 
         if resp.status == 204 then
           self.active_user = nil
+        else
+          Kinvey::Error.from_response(resp)
         end
-
-        self.active_user.nil?
       end
     end
 
     def datastore(clazz)
       clazz.new(self)
-    end
-
-    def datastore_retrieve(opt)
-      collection = opt[:collection]
-
-      resp = @conn.get do |req|
-        req.url "/appdata/#{@appKey}/#{collection}"
-      end
     end
 
     ######
@@ -83,7 +73,7 @@ module Kinvey
     def active_user=(user)
       if user.nil? then
         @m_actuser = nil
-        @conn.headers['Authorization'] = @appAuth
+        @conn.headers['Authorization'] = "Basic " + Base64.strict_encode64("#{@appKey}:#{@appSecret}")
       else
         @m_actuser = user
         @conn.headers['Authorization'] = "Kinvey #{@m_actuser.authtoken}"

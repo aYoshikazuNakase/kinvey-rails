@@ -1,14 +1,14 @@
 module Kinvey
 
   class DataStore
+    attr_reader :collection
+
     def initialize(kinvey)
       @kinvey = kinvey
 
       classname = self.class.name
       classname[0] = classname[0].downcase
       @collection = classname
-
-      p @collection
     end
 
     def create(data = {})

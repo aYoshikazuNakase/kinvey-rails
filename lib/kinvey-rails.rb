@@ -3,6 +3,7 @@ require "faraday_middleware"
 require "uuidtools"
 require "base64"
 
+require "kinvey/error"
 require "kinvey/client"
 require "kinvey/user"
 require "kinvey/datastore"
