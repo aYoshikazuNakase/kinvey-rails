@@ -15,6 +15,11 @@ doc
 # jeweler generated
 pkg
 
+# APP_KEY Config file
+spec/support/config_app_keys.rb
+
+
+
 # Have editor/IDE/OS specific files you need to ignore? Consider using a global gitignore: 
 #
 # * Create a file at ~/.gitignore
