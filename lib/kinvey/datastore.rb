@@ -2,6 +2,7 @@ module Kinvey
 
   class DataStore
     attr_reader :collection
+    attr_accessor :id
 
     def initialize(kinvey)
       @kinvey = kinvey
@@ -11,14 +12,14 @@ module Kinvey
       @collection = classname
     end
 
-    def create(data = {})
+    def create
       resp = @kinvey.conn.post do |req|
         req.url "/appdata/#{@kinvey.appKey}/#{@collection}"
-        req.body = data
+        req.body = make_entity
       end
 
       if resp.status == 201 then
-        resp.body["_id"]
+        @id = resp.body["_id"]
       else
         nil
       end
@@ -34,6 +35,15 @@ module Kinvey
       else
         nil
       end
+    end
+
+    def delete
+      resp = @kinvey.conn.delete do |req|
+        req.url "/appdata/#{@kinvey.appKey}/#{@collection}/#{@id}"
+      end
+    end
+
+    def make_entity
     end
   end
 end

@@ -32,17 +32,17 @@ describe "KinveyRails" do
   it "datastore create" do
     bookstore = @kinvey.datastore(BookmarkCollection)
     bookstore.should_not be_nil
-    id = bookstore.create({"url" => "http://www.access.co.jp"})
+    bookstore.url = "http://www.google.co.jp/"
+    id = bookstore.create
     id.should_not be_nil
   end
 
   it "datastore retrieve" do
     bookstore = @kinvey.datastore(BookmarkCollection)
     books = bookstore.retrieve
-  end
+    del_book = books[0]
 
-  it "datastore del" do
-    #id
+    del_book.delete
   end
 
   it "logout" do
