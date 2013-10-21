@@ -1,21 +1,17 @@
 module Kinvey
 
   class DataStore
-    attr_reader :collection
-    attr_accessor :id
+    attr_reader :collection_name
 
-    def initialize(kinvey)
-      @kinvey = kinvey
-
-      classname = self.class.name
-      classname[0] = classname[0].downcase
-      @collection = classname
+    def initialize(client, name)
+      @client = client
+      @collection_name = name
     end
 
-    def create
-      resp = @kinvey.conn.post do |req|
-        req.url "/appdata/#{@kinvey.appKey}/#{@collection}"
-        req.body = make_entity
+    def create(entity)
+      resp = @client.conn.post do |req|
+        req.url "/appdata/#{@client.appKey}/#{@collection_name}"
+        req.body = entity.to_hash
       end
 
       if resp.status == 201 then
@@ -25,25 +21,64 @@ module Kinvey
       end
     end
 
-    def retrieve
-      resp = @kinvey.conn.get do |req|
-        req.url "/appdata/#{@kinvey.appKey}/#{@collection}"
+    def retrieve(clazz = nil, opt = {})
+      id = opt[:id] unless opt[:id].nil?
+
+      resp = @client.conn.get do |req|
+        if id.nil? then
+          req.url "/appdata/#{@client.appKey}/#{@collection_name}"
+        else
+          req.url "/appdata/#{@client.appKey}/#{@collection_name}/#{id}"
+        end
       end
 
       if resp.status == 200 then
-        resp.body
+        if clazz.nil? then
+          resp.body
+        else
+          retrieve_parse_body(clazz, resp.body)
+        end
       else
         nil
       end
     end
 
-    def delete
-      resp = @kinvey.conn.delete do |req|
-        req.url "/appdata/#{@kinvey.appKey}/#{@collection}/#{@id}"
+    def count
+      resp = @client.conn.get do |req|
+        req.url "/appdata/#{@client.appKey}/#{@collection_name}/_count"
+      end
+
+      if resp.status == 200 then
+        resp.body["count"]
+      else
+        nil
       end
     end
 
-    def make_entity
+    def delete(entity)
+      if not entity.nil? then
+        id = entity.id
+        resp = @client.conn.delete do |req|
+          req.url "/appdata/#{@client.appKey}/#{@collection_name}/#{id}"
+        end
+
+        if not resp.status == 200 then
+          Kinvey::Error.from_response(resp)
+        end
+      end
+    end
+
+    def retrieve_parse_body(clazz, body)
+      entities = {}
+      if body.instance_of?(Array) then
+        body.each do |b|
+          entities[b["_id"]] = clazz.new(b)
+        end
+      else
+        entities[body["_id"]] = clazz.new(body)
+      end
+
+      entities
     end
   end
 end

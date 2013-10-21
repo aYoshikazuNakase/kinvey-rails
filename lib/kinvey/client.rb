@@ -63,8 +63,8 @@ module Kinvey
       end
     end
 
-    def datastore(clazz)
-      clazz.new(self)
+    def datastore(collection_name)
+      Kinvey::DataStore.new(self, collection_name)
     end
 
     ######

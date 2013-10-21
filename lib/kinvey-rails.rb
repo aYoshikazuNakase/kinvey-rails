@@ -6,6 +6,7 @@ require "base64"
 require "kinvey/error"
 require "kinvey/client"
 require "kinvey/user"
+require "kinvey/entity"
 require "kinvey/datastore"
 
 module Kinvey
