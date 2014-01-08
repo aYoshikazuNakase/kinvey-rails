@@ -1,6 +1,10 @@
 require "kinvey-rails"
 require "bookmark_entity"
+require "image_entity"
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
+
+APP_KEY = "kid_VTdIfP_01f"
+APP_SECRET = "68224fc0be294726be11ab0f673c51be"
 
 ##########
 describe "Kinvey Handshake" do
@@ -20,16 +24,16 @@ describe "Kinvey Login" do
   end
 
   it "login failed" do
-    ret = @kinvey.login("a", "----")
+    ret = @kinvey.login("test", "----")
     ret.class.should == Kinvey::Error
     @kinvey.active_user.should be_nil
   end
 
   it "login success" do
-    ret = @kinvey.login("a", "111111")
+    ret = @kinvey.login("test", "111111")
     ret.class.should == Kinvey::User
     @kinvey.active_user.should_not be_nil
-    @kinvey.active_user.username.should == "a"
+    @kinvey.active_user.username.should == "test"
   end
 
   it "logout" do
@@ -42,7 +46,7 @@ end
 describe "Kinvey Datastore" do
   before(:all) do
     @kinvey = Kinvey.init(APP_KEY, APP_SECRET)
-    @kinvey.login("a", "111111")
+    @kinvey.login("test", "111111")
   end
 
   before(:each) do
@@ -100,6 +104,25 @@ describe "Kinvey Datastore" do
     count.should >= 0
     p "@@@@@ count=#{count}"
   end
-
 end
 
+
+describe "Kinvey file reference Datastore" do
+  before(:all) do
+    @kinvey = Kinvey.init(APP_KEY, APP_SECRET)
+    @kinvey.login("test", "111111")
+  end
+
+  before(:each) do
+    @imageCollection= @kinvey.datastore(:ia2013ImageCollection)
+  end
+
+  after(:all) do
+    @kinvey.logout
+  end
+
+  it "file reference datastore" do
+    images = @imageCollection.retrieve(ImageEntity)
+    @imageCollection.count.should == 6
+  end
+end
